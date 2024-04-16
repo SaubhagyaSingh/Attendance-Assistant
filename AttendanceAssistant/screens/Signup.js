@@ -142,7 +142,7 @@ export default function Signup({ navigation }) {
         }}
       >
         <Text>
-          Don’t have an account?{" "}
+          Already have an account?{" "}
           <TouchableOpacity
             onPress={() => navigation.navigate("Login")}
             style={SignUpStyles.link}
