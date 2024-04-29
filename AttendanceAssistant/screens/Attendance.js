@@ -4,7 +4,10 @@ import { View, Text } from "react-native";
 export default function Attendance() {
   return (
     <View>
-      <Text></Text>
+      <View>
+
+      <Text>Add Attendance</Text>
+      </View>
     </View>
   );
 }

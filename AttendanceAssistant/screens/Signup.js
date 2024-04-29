@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import Toast from "react-native-simple-toast";
 
 export default function Signup({ navigation }) {
@@ -16,6 +17,8 @@ export default function Signup({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const auth = getAuth();
 
   const SignUpHandler = () => {
     if (!username.trim()) {
@@ -43,8 +46,18 @@ export default function Signup({ navigation }) {
       return;
     }
 
-    console.log(username, email, phoneNumber, password);
-    // Proceed with signup logic
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed up successfully
+        const user = userCredential.user;
+        console.log("User signed up:", user);
+        // Optionally, you can navigate to another screen upon successful signup
+        navigation.navigate("Home");
+      })
+      .catch((error) => {
+        // Handle errors
+        showToast(error.message);
+      });
   };
 
   const showToast = (message) => {

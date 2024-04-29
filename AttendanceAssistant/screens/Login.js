@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
+
 import {
   View,
   Text,
@@ -8,11 +10,16 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import Toast from "react-native-simple-toast";
 
-export default function Login({ navigation }) {
+export default function Login({}) {
+  const navigation = useNavigation(); // Access navigation object
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const auth = getAuth();
 
   const LoginHandler = () => {
     if (!email.trim() || !email.includes("@")) {
@@ -25,8 +32,18 @@ export default function Login({ navigation }) {
       return;
     }
 
-    console.log(email, password);
-    // Proceed with login logic
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in successfully
+        const user = userCredential.user;
+        console.log("User signed in:", user);
+        // Optionally, you can navigate to another screen upon successful login
+        navigation.navigate("Home"); // Navigate to the "Profile" screen in the "MainStack" navigator
+      })
+      .catch((error) => {
+        // Handle errors
+        showToast(error.message);
+      });
   };
 
   const showToast = (message) => {
