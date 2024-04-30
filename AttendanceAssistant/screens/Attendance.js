@@ -9,8 +9,15 @@ import {
   StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { useAuth } from "../hooks/useAuth"; // Import the useAuth hook
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Toast from "react-native-toast-message";
+import { useNavigation } from "@react-navigation/native";
 
 const Attendance = () => {
+  const { user } = useAuth(); //
+  const navigation = useNavigation();
+
   const [subject, setSubject] = useState("");
   const [panel, setPanel] = useState("");
   const [specialization, setSpecialization] = useState("");
@@ -28,20 +35,25 @@ const Attendance = () => {
         alert("Permission to access media library is required!");
         return;
       }
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         quality: 1,
       });
 
-      if (!result.canceled) {
-        setImageStatus("Image selected");
-        setImage(result.assets[0].uri);
-        return; // No need to proceed further if the user cancels
+      if (result.cancelled) {
+        setImageStatus("Image selection cancelled");
+        return;
       }
+
       if (result.uri) {
         setImage(result.uri);
-        setImageName(result.uri.split("/").pop() || ""); // Extract file name
+        setImageName(result.uri.split("/").pop() || "");
+        setImageStatus("Image selected");
+      } else if (result.assets.length > 0) {
+        setImage(result.assets[0].uri);
+        setImageName(result.assets[0].uri.split("/").pop() || "");
         setImageStatus("Image selected");
       } else {
         setImageStatus("Failed to select image");
@@ -52,16 +64,54 @@ const Attendance = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // Placeholder function for handling form submission
-    console.log("Attendance Details:", {
-      subject,
-      panel,
-      specialization,
-      time,
-      room,
-      image,
-    });
+  const uploadImageToFirebase = async () => {
+    try {
+      const response = await fetch(image);
+      const blob = await response.blob();
+      const imageName = imageName || image.split("/").pop();
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${imageName}`);
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading image to Firebase:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!image) {
+        console.error("No image selected.");
+        return;
+      }
+
+      const imageUrl = await uploadImageToFirebase();
+
+      console.log("Attendance Details:", {
+        subject,
+        panel,
+        specialization,
+        time,
+        room,
+        image: imageUrl,
+      });
+      Toast.show({
+        type: "success",
+        text1: "Image uploaded successfully!",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+
+      // Navigate to gallery
+      navigation.navigate("Gallery");
+      // Optionally, reset form fields or navigate to another screen
+      // ...
+    } catch (error) {
+      console.error("Error uploading image to Firebase:", error);
+      // Handle error gracefully
+    }
   };
 
   return (

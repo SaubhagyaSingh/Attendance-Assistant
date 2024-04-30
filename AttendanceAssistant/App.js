@@ -2,7 +2,6 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Navbar from "./components/Navbar";
-
 import { useAuth } from "./hooks/useAuth.js";
 
 // Import your screen components
@@ -13,6 +12,7 @@ import Home from "./screens/Home";
 import Profile from "./screens/Profile";
 import Attendance from "./screens/Attendance";
 import TimeTableScreen from "./screens/TimeTableScreen";
+import Gallery from "./screens/Gallery";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +28,7 @@ const App = () => {
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Attendance" component={Attendance} />
             <Stack.Screen name="Timetable" component={TimeTableScreen} />
+            <Stack.Screen name="Gallery" component={Gallery} />
           </>
         ) : (
           <>
