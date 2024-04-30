@@ -27,7 +27,7 @@ const App = () => {
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Attendance" component={Attendance} />
-            <Stack.Screen name="TimeTableScreen" component={TimeTableScreen} />
+            <Stack.Screen name="Timetable" component={TimeTableScreen} />
           </>
         ) : (
           <>
